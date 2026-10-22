@@ -1,0 +1,21 @@
+@page "/test"
+@model follow_along.Pages.Pages.TestModel
+@{
+    ViewData["Title"] = "Test";
+}
+
+<h2>Test Page</h2>
+
+<form method="post">
+    <div>
+        <label asp-for="Message"></label>
+        <input asp-for="Message" class="form-control" />
+        <span asp-validation-for="Message" class="text-danger"></span>
+    </div>
+    <button type="submit">Submit</button>
+</form>
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <p>You entered: <strong>@Model.Message</strong></p>
+}

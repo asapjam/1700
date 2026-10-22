@@ -1,25 +1,31 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\james\\Desktop\\Education\\1700\\follow-along\\follow-along.csproj": {}
+    "c:\\Users\\web\\Downloads\\1700\\follow-along\\follow-along.csproj": {}
   },
   "projects": {
-    "C:\\Users\\james\\Desktop\\Education\\1700\\follow-along\\follow-along.csproj": {
+    "c:\\Users\\web\\Downloads\\1700\\follow-along\\follow-along.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\james\\Desktop\\Education\\1700\\follow-along\\follow-along.csproj",
+        "projectUniqueName": "c:\\Users\\web\\Downloads\\1700\\follow-along\\follow-along.csproj",
         "projectName": "follow-along",
-        "projectPath": "C:\\Users\\james\\Desktop\\Education\\1700\\follow-along\\follow-along.csproj",
-        "packagesPath": "C:\\Users\\james\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\james\\Desktop\\Education\\1700\\follow-along\\obj\\",
+        "projectPath": "c:\\Users\\web\\Downloads\\1700\\follow-along\\follow-along.csproj",
+        "packagesPath": "C:\\Users\\web\\.nuget\\packages\\",
+        "outputPath": "c:\\Users\\web\\Downloads\\1700\\follow-along\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\james\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\web\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -64,7 +70,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.400/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.402/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",

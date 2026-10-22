@@ -24,15 +24,26 @@ https://btech.instructure.com/courses/621814/pages/glossary?module_item_id=13445
 
 # Vocabulary
 
+### Data annotations
+
+Attributes you put on properties to declare the rules for valid input.
+
 ### Handler
+
 ### REST (Representational State Transfer)
+
 a set of principles for designing APIs.
+
 ### Safe HTTP Method
+
 Doesn't change server's data.
+
 ### Idempotent
+
 Sending the same request once or ten times leaves the server in the same state.
 
 ### HTTP (HyperText Transfer Protocol)
+
 The set of rules for how clients and servers talk to each other, and everything you build in this course runs on top of it.
 
 ### Razor Pages
@@ -72,6 +83,7 @@ An API is made up of endpoints. Each endpoint is a specific path and HTTP method
 A way to build lightweight HTTP Endpoints.
 
 # FUNDAMENTAL INSTRUCTIONS
+
     cd <path where you want to create a new folder>
     dotnet new webapp -o <New_Project_Folder_Name> --framework net10.0
     dotnet dev-certs https --trust
@@ -103,11 +115,11 @@ Why:
 
 pwd Show the current folder (stands for “print working directory”)
 ls List files and folders in the current directory
-cd                  foldername Change directory (move into a folder)
-cd ..               Move up one level (to the parent folder)
-cd /path/to/folder  Go directly to a folder using an absolute path
-clear               Clear the screen
-cd ~                Return to Home
+cd foldername Change directory (move into a folder)
+cd .. Move up one level (to the parent folder)
+cd /path/to/folder Go directly to a folder using an absolute path
+clear Clear the screen
+cd ~ Return to Home
 
 ## Installing the .NET SDK
 
@@ -171,10 +183,10 @@ C# is object-oriented from the ground up:
 public: accessible from anywhere
 private: only accessible within the same class (default for fields)
 protected: accessible within the class and its subclasses
-    class Dog
-    {
-    public string Name;
-    public int Age;
+class Dog
+{
+public string Name;
+public int Age;
 
             public void Bark()
             {
@@ -193,13 +205,13 @@ protected: accessible within the class and its subclasses
 virtual: allows a method to be overridden in derived classes
 override: indicates you're providing a new implementation of a virtual method
 : is used for inheritance (class Cat inherits from Animal)
-    class Animal
-    {
-    public virtual void Speak()
-    {
-    Console.WriteLine("Animal noise");
-    }
-    }
+class Animal
+{
+public virtual void Speak()
+{
+Console.WriteLine("Animal noise");
+}
+}
 
         class Cat : Animal
         {
@@ -403,23 +415,23 @@ Minimal APIs are a way to build lightweight HTTP Endpoints.
                 Hello from the Minimal API!
 
     HTTP Methods/Verbs:
-        GET 
+        GET
             (Retrieve a resource)
             (Idempotent)
             (Safe)
-        POST 
+        POST
             (Create a new resource)
             (Idempotent)
-        PUT 
+        PUT
             (Replace an existing resource entirely)
             (NOT-Idempotent).
-        PATCH 
+        PATCH
             (Update part of an existing resource)
             (Idempotent)
-        DELETE 
+        DELETE
             (Remove a resource)
             (Idempotent)
-    
+
     HTTP Status Codes:
         First digit informs you on the type of result:
             1xx: Informational.     The request is still being processed.
@@ -427,7 +439,7 @@ Minimal APIs are a way to build lightweight HTTP Endpoints.
             3xx: Redirection.       What you want is somewhere else.
             4xx: Client error.      Something is wrong with the request itself.
             5xx: Server error.      The request was fine, but the server failed handling it.
-    
+
     REST (Representational State Transfer):
         A set of principles for designing APIs.
         Core Conventions:
@@ -447,6 +459,7 @@ Minimal APIs are a way to build lightweight HTTP Endpoints.
                 });
 
 ## cURL & Postman
+
     Must trust the apps certificate by running the following in terminal:
         dotnet dev-certs https --trust
 
@@ -460,3 +473,162 @@ Minimal APIs are a way to build lightweight HTTP Endpoints.
         Must turn off "SSL certificate verification" in Settings while testing locally.
 
 # MODULE 2: Exploring Razor Pages
+
+    Razor Pages is a good fit for:
+        - Business forms and data-entry screens
+        - Admin dashboards and internal tools
+        - Sites where most of the work happens on the server, with little or no JavaScript in the browser
+
+## Anatomy of a Razor Page
+
+    PageModel (.cshtml.cs)
+        a C# class that inherits from PageModel
+        Does two things:
+            - Holds the page's data in public properties.
+            - Handles requests, like onGet()
+    Markup (.cshtml)
+        An ordinary HTML file that can include C# code, by using the "@" symbol.
+        Output values are HTML encoded.
+        Example syntax:
+            - @page :                       Required as first line to give the page a URL
+            - @model FeaturedBandModel :    Which PageModel class this page uses.
+            - @Model.BandName :             Outputs a value from the PageModel into the HTML.
+            - @{ ... } :                    A code block for C# statements.
+            - @if (...) { ... } :           HTML only appears in condition is true.
+            - @* ... *@ :                   Notes that don't reach browser.
+
+    From Request to HTML
+        - https://localhost:7003/FeaturedBand
+            points to FeaturedBand.cshtml, because the file is at Pages/FeaturedBand.cshtml and starts with @page.
+        - GET request is sent and properties are set.
+        - Razor evaulates C# code prefixed with @
+        - Result is wrapped in shared layout and sent to browser.
+
+    The execution is done server-side.
+
+## Forms and Request Handling in Razor Pages
+
+    HTML Forms define a method (GET/POST) and an action. Inputs require a name.
+        Ex. HTML
+            <form action="www.google.com" method="post">
+                <label for="bandName">Suggest a band name:</label>
+                <input id="bandName" name="BandName" />
+                <button type="submit">Submit</button>
+            </form>
+        Ex. HTTP
+            POST /SuggestBand HTTP/1.1
+            Host: localhost:7044
+            Content-Type: application/x-www-form-urlencoded
+
+            BandName=Shorts+Are+Better+Than+Pants&__RequestVerificationToken=CfDJ8N...
+
+    How Forms Send Data
+        Forms that GET put the form data in the URL as a query string, like "/Search?term=metal".
+        Forms that POST put the form data in the request body of the HTTP Request.
+
+    Handling Requests in PageModel
+        GET requests run on onGet()
+        POST requests run on onPost()
+        Ex. PageModel
+            using Microsoft.AspNetCore.Mvc.RazorPages;
+            namespace ServerSideCodeAlong.Pages;
+            public class SuggestBandModel : PageModel
+            {
+                public string Confirmation { get; set; } = string.Empty;
+
+                public void OnGet(){
+                    // Runs when the page first loads.
+                    // Prepare anything the page needs to display.
+                }
+                public void OnPost(){
+                    // Runs when the form is submitted.
+                    Confirmation = "Thanks! Your suggestion is in.";
+                }
+            }
+        Ex. CsHTML
+            @if (!string.IsNullOrEmpty(Model.Confirmation)) {
+                <p>@Model.Confirmation</p>
+            }
+        Handlers can return void, which renders the current page again. They could also redirect to another page by returning an IActionResult:
+            return RedirectToPage();
+
+    Form Resubmission
+        Post isn't safe to repeat, it can lead to duplicates in the database.
+        Solved with Post/Redirect/Get (PRG) pattern:
+            public IActionResult OnPost() {
+                // Save the suggestion somewhere...
+                return RedirectToPage();
+            }
+
+    Async Handlers OnGetAsync() & OnPostAsync()
+        Used to handle slow operations like Database queries.
+        Use OnGet() OR OnGetAsync(), NEVER both.
+        Ex. C#
+            public async Task OnGetAsync() {
+                // Code that awaits slow operations goes here
+            }
+            public async Task<IActionResult> OnPostAsync() {
+                // ...
+                return Page();
+            }
+
+## Model Binding and the PageModel
+
+    HTTP Requests just come back as plain text, not Objects. This sucks. So we have to bind them to Models.
+    Model Binding
+        ASP.NET Core's built-in system for unpacking. Mark the properties you want filled in with [BindProperty].
+        Ex.
+            public class SuggestBandModel : PageModel{
+                    [BindProperty]
+                    public string BandName { get; set; } = string.Empty;
+
+                    public void OnPost() {
+                        // By the time this runs, BandName, Genre, and Rating are already filled in.
+                        Confirmation = $"Thanks! {BandName} is in!";
+                    }
+            }
+        Bound properties are available anywhere the PageModel is.
+        Ex. csHTML
+            <p>@Model.BandName</p>
+        Bound properties may be used with GET requests, via [BindProperty(SupportsGet = true)]
+        Model Binding can also read query strings, like ?searchTerm=metal, and route values, like /bands/{id}.
+        You may also bind properties through the handler.
+        Ex. C#
+            public void OnPost(string bandName){
+                // bandName is bound from the request
+            }
+        If an invalid value is entered, like a string in a number field, it will return the default value and record the issue in the ModelState.
+
+## Shared Layouts and Navigation
+
+    Pages/Shared/_Layout.cshtml
+        Defines the shared header, navbar, and footer across all webpages.
+        Basically each invidual page is just the @RenderBody().
+
+    Pages/_ViewStart.cshtml
+        Runs before each webpage loads.
+        Links the layout to the page.
+
+    Conventionally pages that aren't accessible on their own are prefixed with an _.
+    Links wont use href, they'll use asp-page.
+    Pages can override the default Layout by linking to a different Layout.
+
+## Tag Helpers and Validation
+
+    Tag Helpers
+        a Razor attribute, usually starting with asp-, that runs on the server and generates HTML.
+        asp-for
+            connects an element to a PageModel property.
+            <label asp-for="BandName"></label>
+            <input asp-for="BandName" />
+
+    Data Annotations
+        Like [BindProperty], but they define attributes for valid input.
+        [Required(ErrorMessage = "Why even submit the form without a band name?")]
+        [Display(Name = "Band name")]
+        [StringLength(50, ErrorMessage = "Nobody can remember a band name that long. 50 chars max.")]
+
+    Validation
+        Declaring a type string?/int? allows the value to be optional in ASP.NET Core.
+        ModelState.IsValid bool allows us to check if all the inputs were valid.
+        <div asp-validation-summary="All"></div> at the top of a csHMTL file will list all errors together.
