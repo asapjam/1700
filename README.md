@@ -24,6 +24,10 @@ https://btech.instructure.com/courses/621814/pages/glossary?module_item_id=13445
 
 # Vocabulary
 
+### Migration
+
+A migration is a recorded set of changes that brings your database's structure in line with your entity classes.
+
 ### Data annotations
 
 Attributes you put on properties to declare the rules for valid input.
@@ -90,6 +94,8 @@ A way to build lightweight HTTP Endpoints.
     dotnet run
     OR
     dotnet watch (for hot reloading)
+    dotnet add package Microsoft.EntityFrameworkCore.Sqlite --version 10.0.11
+    dotnet tool install --global dotnet-ef --version 10.0.11
     THEN
     in launchSettings.json
     put the HTTPS profile at the top, not the bottom.
@@ -632,3 +638,84 @@ Minimal APIs are a way to build lightweight HTTP Endpoints.
         Declaring a type string?/int? allows the value to be optional in ASP.NET Core.
         ModelState.IsValid bool allows us to check if all the inputs were valid.
         <div asp-validation-summary="All"></div> at the top of a csHMTL file will list all errors together.
+
+# MODULE 3: EF Core and SQLite
+
+    Entity Framework Core (EF Core)
+        An ORM (Object-Relational Mapper) that takes C# and turns it into SQL to interface with databases.
+        Uses a Provider to know what sort of databse it is interfacing with.
+        Querying to the database:
+            You write a LINQ (Language Integrated Query) in C#
+            EF Core turns it into SQL.
+            Ex.
+                var popularBands = context.Bands
+                    .Where(b => b.MonthlyListens > 10000)
+                    .OrderBy(b => b.Name)
+                    .ToList();
+        Adding to the database:
+            Create an object that is an instance of a class.
+            EF Core Maps the class to a table, and the properties to the columns.
+            Ex.
+                var band = new Band { Name = "The Plain Defaults", Genre = "Garage Rock"};
+                context.Bands.Add(band);
+                context.SaveChanges();
+
+    SQLite
+        Full relational database that is stored in a single .db file.
+        Can have many readers, but only a single writer.
+        Lacks DECIMAL and DATE types.
+        Add to project via terminal:
+            dotnet add package Microsoft.EntityFrameworkCore.Sqlite --version 10.0.11
+
+## Entities and Conventions
+
+    Entities
+        A C# class that EFCore turns into SQL to make a table, full of instances of that class.
+        The terms Models & Entities may be used interchangably.
+
+    Conventions
+        A property named "Id" or "<ClassName>Id" becomes the Primary Key and has Auto-increment.
+        Tables make the name of the class plural, so  the "Band" class becomes the "Bands" table.
+        Columns are named after class properties.
+        Can have null entries if a properties type is string?/int?/ etc.
+        Data Annotations like [Table("...")] or [Required] can change the table.
+        Things aren't added to database unless you instruct for them to be.
+
+## DBContext and Configuration
+
+    All Database operations in EF Core go through a DbContext.
+
+    DbContext
+        - Connects to the database
+        - Queries the database
+        - Tracks changes
+        - Saves to the database.
+
+    Defining a DbContext
+        - A new public class that inherits from DbContext.
+        - Takes options that tell us where the database is.
+        - Each DbSet within this new class is a table.
+        - Must be referenced in program.cs before build().
+
+    Connection String
+        - Stored in appsettings.json
+        Ex.
+            "ConnectionStrings": {
+                "DefaultConnection": "Data Source=mixtape.db"
+            },
+
+## Dependency Injection
+
+    Basically you register AddDbContext as a service to the builder.
+    Request it (as a constructor parameter) whenever you need it.
+
+## Migrations and the Database Lifecycle
+
+    A migration is a recorded set of changes that brings your database's structure in line with your entity classes.
+
+    Essentially if you need to add a parameter to an object, to add that column to a table you must do a migration.
+
+    Migration Cycle
+        - Change your entities. Add a class, add a property, change a type.
+        - Create a migration. dotnet ef migrations add <Name> compares your entities to what the database should currently look like and writes C# code describing the difference.
+        - Apply it. dotnet ef database update runs that code against the database.
