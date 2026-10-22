@@ -25,6 +25,15 @@ https://btech.instructure.com/courses/621814/pages/glossary?module_item_id=13445
 # Vocabulary
 
 ### Handler
+### REST (Representational State Transfer)
+a set of principles for designing APIs.
+### Safe HTTP Method
+Doesn't change server's data.
+### Idempotent
+Sending the same request once or ten times leaves the server in the same state.
+
+### HTTP (HyperText Transfer Protocol)
+The set of rules for how clients and servers talk to each other, and everything you build in this course runs on top of it.
 
 ### Razor Pages
 
@@ -62,6 +71,17 @@ An API is made up of endpoints. Each endpoint is a specific path and HTTP method
 
 A way to build lightweight HTTP Endpoints.
 
+# FUNDAMENTAL INSTRUCTIONS
+    cd <path where you want to create a new folder>
+    dotnet new webapp -o <New_Project_Folder_Name> --framework net10.0
+    dotnet dev-certs https --trust
+    dotnet run
+    OR
+    dotnet watch (for hot reloading)
+    THEN
+    in launchSettings.json
+    put the HTTPS profile at the top, not the bottom.
+
 # MODULE 0: Getting Started
 
 ## Terminal Basics
@@ -83,11 +103,11 @@ Why:
 
 pwd Show the current folder (stands for “print working directory”)
 ls List files and folders in the current directory
-cd foldername Change directory (move into a folder)
-cd .. Move up one level (to the parent folder)
-cd /path/to/folder Go directly to a folder using an absolute path
-clear Clear the screen
-cd ~ Return to Home
+cd                  foldername Change directory (move into a folder)
+cd ..               Move up one level (to the parent folder)
+cd /path/to/folder  Go directly to a folder using an absolute path
+clear               Clear the screen
+cd ~                Return to Home
 
 ## Installing the .NET SDK
 
@@ -151,16 +171,16 @@ C# is object-oriented from the ground up:
 public: accessible from anywhere
 private: only accessible within the same class (default for fields)
 protected: accessible within the class and its subclasses
-class Dog
-{
-public string Name;
-public int Age;
+    class Dog
+    {
+    public string Name;
+    public int Age;
 
-        public void Bark()
-        {
-            Console.WriteLine(Name + " says woof!");
+            public void Bark()
+            {
+                Console.WriteLine(Name + " says woof!");
+            }
         }
-    }
 
     // Using the class:
     Dog myDog = new Dog();
@@ -173,21 +193,21 @@ public int Age;
 virtual: allows a method to be overridden in derived classes
 override: indicates you're providing a new implementation of a virtual method
 : is used for inheritance (class Cat inherits from Animal)
-class Animal
-{
-public virtual void Speak()
-{
-Console.WriteLine("Animal noise");
-}
-}
-
-    class Cat : Animal
+    class Animal
     {
-        public override void Speak()
-        {
-            Console.WriteLine("Meow");
-        }
+    public virtual void Speak()
+    {
+    Console.WriteLine("Animal noise");
     }
+    }
+
+        class Cat : Animal
+        {
+            public override void Speak()
+            {
+                Console.WriteLine("Meow");
+            }
+        }
 
 ### Exception Handling
 
@@ -362,3 +382,81 @@ Minimal APIs are a way to build lightweight HTTP Endpoints.
         "Ctrl + F5" OR "dotnet run" in a terminal.
 
 ## HTTP & REST
+
+    HTTP Request & Response are literally just text.
+    The HTTP Request/Response Cycle:
+        REQUEST (Client)
+            - w/ a METHOD, like GET, POST, etc
+            - w/ a path, like /hello
+            - w/ a header, containing extra info about the request
+            - w/ a body, data sent along with the request
+            Ex.
+                GET /hello HTTP/1.1
+                Host: localhost:7044
+        RESPONSE (Server)
+            - w/ a status code, like 200 OK or 404 Not Found.
+            - w/ a header, containing extra info about the response
+            - w/ a body, the content being returned (HTML, JSON, plain text)
+            Ex.
+                HTTP/1.1 200 OK
+                Content-Type: text/plain; charset=utf-8
+                Hello from the Minimal API!
+
+    HTTP Methods/Verbs:
+        GET 
+            (Retrieve a resource)
+            (Idempotent)
+            (Safe)
+        POST 
+            (Create a new resource)
+            (Idempotent)
+        PUT 
+            (Replace an existing resource entirely)
+            (NOT-Idempotent).
+        PATCH 
+            (Update part of an existing resource)
+            (Idempotent)
+        DELETE 
+            (Remove a resource)
+            (Idempotent)
+    
+    HTTP Status Codes:
+        First digit informs you on the type of result:
+            1xx: Informational.     The request is still being processed.
+            2xx: Success.           The request worked.
+            3xx: Redirection.       What you want is somewhere else.
+            4xx: Client error.      Something is wrong with the request itself.
+            5xx: Server error.      The request was fine, but the server failed handling it.
+    
+    REST (Representational State Transfer):
+        A set of principles for designing APIs.
+        Core Conventions:
+            Resource-based:             Paths name things. You'll see /bands/42, not /getBand?id=42.
+            Methods do the HTTP Verb:   GET /bands/1, will get you the first band.
+            Stateless:                  Each request carries everything the server needs to handle it.
+            Consistent:                 Once you know the pattern, you can guess how an API works.
+        REST in Minimal APIs:
+            Map method name tells you the HTTP method.
+            Route is the resource path.
+            Results helpers let you return the right status code.
+            EX.
+                app.MapPost("/bands", (Band band) =>
+                {
+                    bands.Add(band);
+                    return Results.Created($"/bands/{band.Id}", band);
+                });
+
+## cURL & Postman
+    Must trust the apps certificate by running the following in terminal:
+        dotnet dev-certs https --trust
+
+    cURL
+        Good for one-off GET requests.
+        Ex.
+            curl.exe -i https://localhost:<your-port>/hello
+    Postman
+        Good for all other requests.
+        Has a UI, so a bit easier to use.
+        Must turn off "SSL certificate verification" in Settings while testing locally.
+
+# MODULE 2: Exploring Razor Pages
