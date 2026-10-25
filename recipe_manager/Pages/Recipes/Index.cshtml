@@ -1,0 +1,40 @@
+﻿@page
+@model recipe_manager.Pages.Recipes.IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<h2>Recipe Index</h2>
+
+<p>
+    <a asp-page="/Recipes/Create" class="btn btn-primary">Create New Recipe</a>
+</p>
+
+@if (Model.Recipes.Count == 0)
+{
+    <p>No recipes yet...</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var recipe in Model.Recipes)
+        {
+            <tr>
+                <td>@recipe.Name</td>
+                <td maxlength="120">@recipe.Description</td>
+                <td>
+                    <a asp-page="/Recipes/Details" asp-route-id="@recipe.Id" class="btn btn-primary">See Full Recipe</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

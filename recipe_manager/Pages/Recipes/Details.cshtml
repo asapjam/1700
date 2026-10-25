@@ -1,0 +1,36 @@
+﻿@page "{Id:int}"
+@model recipe_manager.Pages.Recipes.DetailsModel
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Recipe Detail</h2>
+
+<a asp-page="/Recipes/Index" class="btn btn-primary">Back to Index</a>
+
+@if(Model.recipe == null)
+{
+    <p>
+        This recipe doesn't exist- and frankly... you should be ashamed of yourself.
+    </p>
+}
+else{
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Ingredients</th>
+            <th>Instructions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Model.recipe.Name</td>
+            <td>@Model.recipe.Description</td>
+            <td>@Model.recipe.Ingredients</td>
+            <td>@Model.recipe.Instructions</td>
+        </tr>
+    </tbody>
+</table>
+}

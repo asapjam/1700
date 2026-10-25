@@ -88,17 +88,46 @@ A way to build lightweight HTTP Endpoints.
 
 # FUNDAMENTAL INSTRUCTIONS
 
-    cd <path where you want to create a new folder>
-    dotnet new webapp -o <New_Project_Folder_Name> --framework net10.0
-    dotnet dev-certs https --trust
-    dotnet run
-    OR
-    dotnet watch (for hot reloading)
-    dotnet add package Microsoft.EntityFrameworkCore.Sqlite --version 10.0.11
-    dotnet tool install --global dotnet-ef --version 10.0.11
-    THEN
-    in launchSettings.json
-    put the HTTPS profile at the top, not the bottom.
+    Create the Web App
+        cd <path where you want to create a new folder>
+        dotnet new webapp -o <New_Project_Folder_Name> --framework net10.0
+        cd <new folder>
+        dotnet dev-certs https --trust
+        dotnet run OR dotnet watch (for hot reload)
+
+    Configure HTTPS
+        in launchSettings.json
+        put the HTTPS profile at the top, not the bottom.
+    
+    Add Packages
+        EFCore support for SQLite:
+            dotnet add package Microsoft.EntityFrameworkCore.Sqlite --version 10.0.11
+        EFCore design-time support for Migrations:
+            dotnet add package Microsoft.EntityFrameworkCore.Design --version 10.0.11
+        EFCore CLI
+            dotnet tool install --global dotnet-ef --version 10.0.11
+
+    Define a Default Connection string in appsettings.json
+        "ConnectionStrings": {
+            "DefaultConnection": "Data Source=recipes.db"
+        },
+
+    Configure Project to Use Packages
+        in Program.cs
+            using Microsoft.EntityFrameworkCore;
+            using follow_along.Data;
+            add DbContext class to Build.Services
+        in Data Folder
+            create your inherited DbContext class
+    
+    Create InitialMigration
+        dotnet ef migrations add InitialCreate
+    Apply Migrations
+        dotnet ef database update
+    
+    Scaffolding webpages like /Details/{id}
+        Requires you to define page routing next to @page in cshtml file,
+        then bind that property to the pagemodel
 
 # MODULE 0: Getting Started
 
@@ -719,3 +748,116 @@ Minimal APIs are a way to build lightweight HTTP Endpoints.
         - Change your entities. Add a class, add a property, change a type.
         - Create a migration. dotnet ef migrations add <Name> compares your entities to what the database should currently look like and writes C# code describing the difference.
         - Apply it. dotnet ef database update runs that code against the database.
+
+## Code Along
+
+    We install EFCore packages.
+        So we can use SQLite & Design tools.
+    We create a Model folder, and our first Model (Book.cs)
+        This model will later be made into a table.
+    We define some parameters within Book.cs
+        Id, Title, Author.
+    We create a Data folder, and our DbContext (AppDbContext.cs).
+        This will coordinate Database access.
+    We create a default connection string in appsettings.json
+        Tells SQLite to use a database file named books.db
+    We register the context within Program.cs
+        We tell the Program.cs file what namespace & resources we are using.
+        We also tell the builder that AddDbContext will be treated as a Service.
+
+# MODULE 4: Displaying and Creating Records with Razor Pages and EF Core
+
+## Reading Data
+    
+    Changing the URL
+        putting a Page within a Folder under Pages, will make that folder name part of the URL.
+    
+    LINQ Syntax
+    Filter
+        Where(...)              WHERE
+        OrderBy(...)            ORDER BY
+        OrderByDescending(...)  
+        Include(...)            JOIN
+        ThenBy(...)             ORDER BY ..., ...
+        Take(n)                 LIMIT n
+    Run
+        ToListAsync()           Returns a list of matching rows.
+        FirstOrDefaultAsync()   Returns first match.
+        FindAsync(id)           Find a row by it's primary key.
+        CountAsync()         
+    Optimization
+        AsNoTracking()          Used when only viewing data, not changing.   
+
+## Creating Records
+
+We won't [BindProperty] directly to the entity, because bad actors could abuse this to push data to fields the FORM doesn't contain or intend to change.
+
+#### Overposting 
+submitting extra fields to set values the user should never control.
+
+#### InputModel
+A small nested class that contains only the fields the form is allowed to submit, prevents overposting. Additionally, they seperate form rules from database rules.
+
+Disposable, you'll make a new() one for each input.
+
+#### Binding to the InputModel
+You can access internal properties with Dot-Notation. Whatever you decide to name your new InputModel Object, you'll use a dot to access it's properties.
+    Ex. .csHTML
+        <div class="mb-3">
+        <label asp-for="Input.Name" class="form-label"></label>
+        <input asp-for="Input.Name" class="form-control" />
+
+#### Validation Beyond Annotations
+Simple rules like "Required" and "Max 50 Characters" can be handeled by Data Annotations. Other more complicated issues, like if our entry into the database is a duplicate must be manually logged with ModelState.AddModelError(...)
+    Ex. C#
+        if (await _context.Bands.AnyAsync(b => b.Name == name)){
+            ModelState.AddModelError("Input.Name", "That band name is taken. Expect a cease and desist by tomorrow.");
+            return Page();
+        };
+       
+Data Validation Order
+- Set Data Annotation Rules
+- Check ModelState.IsValid
+- Record Database conflicts with ModelState.AddModelError(...)
+
+#### Save the Record
+Take the data from the InputModel, and create a new Entity with it. Then use SaveChangesAsync() to commit your changes to the database.
+Ex. C#
+    var band = new Band
+    {
+        Name = name,
+        Genre = Input.Genre?.Trim(),
+        HasHorns = Input.HasHorns
+    };
+
+    _context.Bands.Add(band);
+    await _context.SaveChangesAsync();
+
+#### Redirect After Save
+Ex. C#
+    return RedirectToPage("./Index");
+
+## Change Tracking
+
+#### Update an Entity
+Load it, change it, save it:
+Ex.
+    var band = await _context.Bands.FindAsync(id);
+    band!.Genre = "Adult Contemporary";
+    await _context.SaveChangesAsync();
+
+#### Delete an Entity
+Load it, delete it, save it:
+Ex.
+    var band = await _context.Bands.FindAsync(id);
+    if (band is not null){
+        _context.Bands.Remove(band);
+        await _context.SaveChangesAsync();
+    }
+
+#### One Save, Many Changes
+SaveChangesAsync() handles every pending change at once.
+Either every change success, or nothing is saved.
+
+#### AsNoTracking()
+Used on GET calls, but nowhere else- or it doesnt track changes.
