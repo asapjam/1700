@@ -861,3 +861,118 @@ Either every change success, or nothing is saved.
 
 #### AsNoTracking()
 Used on GET calls, but nowhere else- or it doesnt track changes.
+
+# MODULE 5: Editing, Deleting, and API Endpoints
+
+#### Route Parameters & Binding
+
+In .cshtml file you may set a Page Directive. This allows you to tie URLs to specific Database entries.
+
+Ex. csHTML
+    @page "{id:int}"
+
+This will add the Id to the URL.
+Ex. URL
+    localhost:5000/Books/Edit/3
+
+That parameter can then be bound to the PageModel so it pulls the database entry with the appropriate Id.
+
+Ex. C#
+    OnGetAsync(int id)
+    // OR
+    [BindProperty (SupportsGet = true)]
+    public int Id {get; set;}
+
+#### Validation and Error Handling
+
+Check if the ModelState.IsValid
+
+Ex. C#
+    If(ModelState.IsValid){...}
+
+Check for more complicated issues (Does this entry already exist?), and manually raise Model errors.
+
+Ex. C#
+    if (await _context.Bands.AnyAsync(b => b.Name == name)){
+        ModelState.AddModelError("Input.Name", "That band name is taken. Expect a cease and desist by tomorrow.");
+        return Page();
+    };
+
+Check for concurrency (Someone deleted the thing I was updating...) with a try{}, catch{} block.
+
+Ex. C#
+    try{ await _context.SaveChangesAsync(); }
+    catch (DbUpdateConcurrencyException) {
+    if (!await _context.Books.AnyAsync(b => b.Id == Input.Id))
+        return NotFound();
+    throw; // let the framework handle unexpected errors
+}
+
+#### Deleting Records & Confirmation
+
+Tell the user what they are deleting, and make sure they want to do so.
+Delete and save the changes to the Database.
+
+Ex. C#
+    var book = await _context.Books.FirstOrDefaultAsync(b => b.Id == id);
+    if (book is null) return NotFound();
+
+    _context.Books.Remove(book);
+    await _context.SaveChangesAsync();
+
+#### Minimal API CRUD
+
+In Program.cs just before app.Run():
+
+GET
+Ex. C#
+    // Get a single book by ID
+    app.MapGet("/api/books/{id:int}", async (int id, AppDbContext db) =>
+    {
+        var book = await db.Books.FirstOrDefaultAsync(b => b.Id == id);
+        return book is not null ? Results.Ok(book) : Results.NotFound();
+    });
+
+POST
+Ex. C#
+    app.MapPost("/api/books", async (Book book, AppDbContext db) =>
+    {
+        if (string.IsNullOrWhiteSpace(book.Title) || string.IsNullOrWhiteSpace(book.Author))
+            return Results.BadRequest(new { error = "Title and Author are required." });
+
+        db.Books.Add(book);
+        await db.SaveChangesAsync();
+        return Results.Created($"/api/books/{book.Id}", book);
+    });
+
+PUT
+Ex. C#
+    app.MapPut("/api/books/{id:int}", async (int id, Book updated, AppDbContext db) =>
+    {
+        if (id != updated.Id) return Results.BadRequest(new { error = "ID mismatch." });
+
+        var book = await db.Books.FirstOrDefaultAsync(b => b.Id == id);
+        if (book is null) return Results.NotFound();
+
+        if (string.IsNullOrWhiteSpace(updated.Title) || string.IsNullOrWhiteSpace(updated.Author))
+            return Results.BadRequest(new { error = "Title and Author are required." });
+
+        book.Title = updated.Title.Trim();
+        book.Author = updated.Author.Trim();
+        await db.SaveChangesAsync();
+
+        return Results.Ok(book);
+    });
+
+DELETE
+Ex. C#
+    app.MapDelete("/api/books/{id:int}", async (int id, AppDbContext db) =>
+    {
+        var book = await db.Books.FirstOrDefaultAsync(b => b.Id == id);
+        if (book is null) return Results.NotFound();
+
+        db.Books.Remove(book);
+        await db.SaveChangesAsync();
+        return Results.NoContent();
+    });
+

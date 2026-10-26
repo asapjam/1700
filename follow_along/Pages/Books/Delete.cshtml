@@ -1,0 +1,22 @@
+﻿@page "{Id: int}"
+@model follow_along.Pages.Books.DeleteModel
+@{
+    ViewData["Title"] = "Delete Book";
+}
+
+<h2>Delete Book</h2>
+
+<h3>Are you sure you want to delete this book?</h3>
+
+@if (Model.Book is not null)
+{
+    <div class="mb-3">
+        <p><strong>Title:</strong> @Model.Book.Title</p>
+        <p><strong>Author:</strong> @Model.Book.Author</p>
+    </div>
+}
+
+<form method="post">
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-page="./Index" class="btn btn-secondary">Cancel</a>
+</form>

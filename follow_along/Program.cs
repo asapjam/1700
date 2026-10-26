@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+
 using follow_along.Data;
+using follow_along.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,5 +32,7 @@ app.MapRazorPages()
    .WithStaticAssets();
 
 app.MapGet("/hello", () => "Hello from the Minimal API!");
+
+app.MapBookEndpoints();
 
 app.Run();
