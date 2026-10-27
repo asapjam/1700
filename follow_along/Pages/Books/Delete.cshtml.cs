@@ -44,6 +44,8 @@ public class DeleteModel : PageModel
         _context.Books.Remove(book);
         await _context.SaveChangesAsync();
 
+        TempData["StatusMessage"] = "Book deleted successfully!";
+
         return RedirectToPage("./Index");
     }
 }

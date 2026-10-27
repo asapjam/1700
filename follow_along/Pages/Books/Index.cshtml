@@ -6,6 +6,8 @@
 
 <h2>Books</h2>
 
+<partial name="_StatusMessage" model="@TempData["StatusMessage"] as string" />
+
 <p>
     <a asp-page="/Books/Create" class="btn btn-primary">Create New</a>
 </p>
@@ -27,20 +29,10 @@ else
         </thead>
 
         <tbody>
-        @foreach (var book in Model.Books)
-        {
-            <tr>
-                <td>@book.Title</td>
-                <td>@book.Author</td>
-                <td>@book.Category?.Name</td>
-                <td>
-                    <a asp-page="./Edit"
-                       asp-route-id="@book.Id">Edit</a> |
-                    <a asp-page="./Delete"
-                       asp-route-id="@book.Id">Delete</a>
-                </td>
-            </tr>
-        }
+            @foreach (var book in Model.Books)
+            {
+                <partial name="_BookRow" model="book" />
+            }
         </tbody>
     </table>
 }

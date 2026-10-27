@@ -67,6 +67,8 @@ public class CreateModel : PageModel
         _context.Books.Add(book);
         await _context.SaveChangesAsync();
 
+        TempData["StatusMessage"] = "Book created successfully!";
+
         return RedirectToPage("./Index");
     }
 

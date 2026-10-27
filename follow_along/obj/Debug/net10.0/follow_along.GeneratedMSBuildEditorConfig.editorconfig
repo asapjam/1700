@@ -47,6 +47,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQm9va3NcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/web/Downloads/1700/follow_along/Pages/Books/_BookRow.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQm9va3NcX0Jvb2tSb3cuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/web/Downloads/1700/follow_along/Pages/Categories/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2F0ZWdvcmllc1xJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -61,6 +65,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/web/Downloads/1700/follow_along/Pages/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJpdmFjeS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/web/Downloads/1700/follow_along/Pages/Shared/_StatusMessage.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9TdGF0dXNNZXNzYWdlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/web/Downloads/1700/follow_along/Pages/Shared/_ValidationScriptsPartial.cshtml]

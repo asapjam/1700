@@ -1054,7 +1054,7 @@ Ex. C#
 Backfilling:
 - We defined a new [REQUIRED] property, but existing records lack this data.
 - Solved via Migration
-- Specifically solved by inserting SQL into a migration we have created but not pushed.
+- Specifically solved by inserting raw SQL into a migration we have created but not pushed.
 Ex. C#
     protected override void Up(MigrationBuilder migrationBuilder)
     {
@@ -1064,3 +1064,60 @@ Ex. C#
             WHERE CategoryId IS NULL OR CategoryId = 0;
         ");
     }
+
+# MODULE 7: DRY Up Your Views
+
+“Don’t Repeat Yourself” is a software engineering principle that reduces duplication of logic, markup, or configuration.
+
+WHY:
+Fewer bugs: You fix issues in one place instead of multiple.
+
+Easier updates: Adding a new field or changing markup requires editing one file.
+
+Cleaner code: Reuse keeps your views focused and easier to read.
+
+#### Partial Views
+A partial view is a reusable .cshtml file that contains a fragment of markup, not a full page.
+It can accept a model (like Book) to display dynamic data.
+Ex. _BookRow.cshtml
+    @model Book
+
+    <tr>
+        <td>@Model.Title</td>
+        <td>@Model.Author</td>
+        <td>@Model.Category?.Name</td>
+        <td>
+            <a asp-page="Edit" asp-route-id="@Model.Id">Edit</a> |
+            <a asp-page="Delete" asp-route-id="@Model.Id">Delete</a>
+        </td>
+    </tr>
+
+Instead of repeating the row markup in every place you list books, use the <partial> tag helper:
+Ex.
+    @foreach (var book in Model.Books)
+    {
+        <partial name="_BookRow" model="book" />
+    }
+
+#### TempData
+Data that can survive a redirect, and delete itself after it has been read.
+Stored in a Dictionary.
+Great for user feedback.
+
+Storing:
+Ex. C#
+    TempData["StatusMessage"] = "Book created successfully!";
+
+Retrieving via Partial:
+Ex. _StatusMessage.csHTML:
+    @model string
+
+    @if (!string.IsNullOrEmpty(Model))
+    {
+        <div class="alert alert-success" role="alert">
+            @Model
+        </div>
+    }
+Ex. csHTML
+    <partial name="_StatusMessage" model="TempData["StatusMessage"] as string" />
+

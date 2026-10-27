@@ -90,6 +90,8 @@ public class EditModel : PageModel
 
         await _context.SaveChangesAsync();
 
+        TempData["StatusMessage"] = "Book updated successfully!";
+
         return RedirectToPage("./Index");
     }
 
