@@ -21,6 +21,8 @@ public class CreateModel : PageModel
     [BindProperty]
     public InputModel Input { get; set; } = new();
 
+    public List<Category> Categories { get; private set; } = new();
+
     public class InputModel
     {
         [Required(ErrorMessage = "Title is required.")]
@@ -30,29 +32,55 @@ public class CreateModel : PageModel
         [Required(ErrorMessage = "Author is required.")]
         [MaxLength(200)]
         public string Author { get; set; } = string.Empty;
+
+        [Range(1, int.MaxValue, ErrorMessage = "Please select a category.")]
+        public int CategoryId { get; set; }
     }
 
-    public void OnGet()
+    public async Task OnGetAsync()
     {
-        // Render the empty form
+        await LoadCategoriesAsync();
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (!await CategoryExistsAsync(Input.CategoryId))
+        {
+            ModelState.AddModelError(
+                "Input.CategoryId",
+                "Please select a valid category.");
+        }
+
         if (!ModelState.IsValid)
         {
+            await LoadCategoriesAsync();
             return Page();
         }
 
         var book = new Book
         {
             Title = Input.Title.Trim(),
-            Author = Input.Author.Trim()
+            Author = Input.Author.Trim(),
+            CategoryId = Input.CategoryId
         };
 
         _context.Books.Add(book);
         await _context.SaveChangesAsync();
 
         return RedirectToPage("./Index");
+    }
+
+    private async Task LoadCategoriesAsync()
+    {
+        Categories = await _context.Categories
+            .AsNoTracking()
+            .OrderBy(c => c.Name)
+            .ToListAsync();
+    }
+
+    private async Task<bool> CategoryExistsAsync(int categoryId)
+    {
+        return await _context.Categories
+            .AnyAsync(c => c.Id == categoryId);
     }
 }

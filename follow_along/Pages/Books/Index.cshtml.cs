@@ -24,6 +24,7 @@ public class IndexModel : PageModel
     {
         Books = await _context.Books
             .AsNoTracking()
+            .Include(b => b.Category)
             .OrderBy(b => b.Title)
             .ToListAsync();
     }

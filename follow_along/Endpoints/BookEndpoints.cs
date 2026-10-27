@@ -8,9 +8,11 @@ namespace follow_along.Endpoints;
 public class BookInput
 {
     public string Title { get; set; } = string.Empty;
-    public string Author { get; set; } = string.Empty;
-}
 
+    public string Author { get; set; } = string.Empty;
+
+    public int CategoryId { get; set; }
+}
 public static class BookEndpoints
 {
     public static void MapBookEndpoints(this WebApplication app)
@@ -47,10 +49,20 @@ public static class BookEndpoints
                     new { error = "Title and Author are required." });
             }
 
+            var categoryExists = await db.Categories
+                .AnyAsync(c => c.Id == input.CategoryId);
+
+            if (!categoryExists)
+            {
+                return Results.BadRequest(
+                    new { error = "A valid category is required." });
+            }
+
             var book = new Book
             {
                 Title = input.Title.Trim(),
-                Author = input.Author.Trim()
+                Author = input.Author.Trim(),
+                CategoryId = input.CategoryId
             };
 
             db.Books.Add(book);
@@ -71,6 +83,15 @@ public static class BookEndpoints
                     new { error = "Title and Author are required." });
             }
 
+            var categoryExists = await db.Categories
+                .AnyAsync(c => c.Id == input.CategoryId);
+
+            if (!categoryExists)
+            {
+                return Results.BadRequest(
+                    new { error = "A valid category is required." });
+            }
+
             var book = await db.Books.FindAsync(id);
 
             if (book is null)
@@ -80,6 +101,7 @@ public static class BookEndpoints
 
             book.Title = input.Title.Trim();
             book.Author = input.Author.Trim();
+            book.CategoryId = input.CategoryId;
 
             await db.SaveChangesAsync();
 

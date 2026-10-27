@@ -1,0 +1,36 @@
+@page
+@model follow_along.Pages.Categories.IndexModel
+@{
+    ViewData["Title"] = "Categories";
+}
+
+<h2>Categories</h2>
+
+<ul>
+@foreach (var category in Model.Categories)
+{
+    <li>@category.Name</li>
+}
+</ul>
+
+<hr />
+
+<h3>Add New Category</h3>
+
+<form method="post" class="mb-3">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Input.Name" class="form-label"></label>
+        <input asp-for="Input.Name" class="form-control" />
+        <span asp-validation-for="Input.Name" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Add Category
+    </button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

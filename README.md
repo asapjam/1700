@@ -24,6 +24,10 @@ https://btech.instructure.com/courses/621814/pages/glossary?module_item_id=13445
 
 # Vocabulary
 
+### Schema
+
+### Navigation Property
+
 ### Migration
 
 A migration is a recorded set of changes that brings your database's structure in line with your entity classes.
@@ -976,3 +980,87 @@ Ex. C#
         return Results.NoContent();
     });
 
+# MODULE 6: Categories
+
+Create a Category Model, and link it to the Book Model via a foreign-key.
+
+#### Model Relationships with EF Core
+
+One-to-Many Relationships: 
+- One Category can have many Books
+- One Book can have exatcly one Category.
+
+Linked via a foreign-key:
+- Category.Id linked to Book.CategoryId
+- Make that CategoryId required
+Ex. C# Book.cs
+    [REQUIRED]
+    public int CategoryId { get; set; }
+
+With a Navigation Property:
+- An object reference that lets you traverse the relationship in code.
+Ex. C# Book.cs
+    public Category? Category { get; set; }
+- A collection navigation property.
+Ex. C# Category.cs
+    public List<Book> Books { get; set; } = new();
+
+This allows you to move entities both directions. 
+- Find a Category object through a Book object.
+- Find all Book objects through a Category Object.
+
+#### Building a Simple CRUD Page for Related Entities
+
+List Records, with Create Category Form at the bottom.
+Create a new Category object.
+Bind it to the Form.
+Validate the Model.
+Add it to the database.
+Save the database.
+
+#### Displaying Related Data in Razor Pages
+
+RazorPages automatically creates a foreign-key relationship for CategoryId.
+
+The tables must be JOIN'd to see which Category Object is associated with each CategoryId.
+Otherise Category will be null.
+We can do so using .Include()
+Ex. C#
+    Books = await _context.Books
+    .Include(b => b.Category)
+    .OrderBy(b => b.Title)
+    .ToListAsync();
+Ex. csHTML
+    <td>@book.Category?.Name</td>
+
+#### Managing Data During Schema Changes - Seeding and Backfilling
+
+Seeding:
+- Prepopulating a Database.
+- Done by overriding the base AppDbContext's OnModelCreating() method.
+- Require an explicit Id
+Ex. C#
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Category>().HasData(
+            new Category { Id = 1, Name = "Science Fiction" },
+            new Category { Id = 2, Name = "Fantasy" },
+            new Category { Id = 3, Name = "Mystery" }
+        );
+    }
+
+Backfilling:
+- We defined a new [REQUIRED] property, but existing records lack this data.
+- Solved via Migration
+- Specifically solved by inserting SQL into a migration we have created but not pushed.
+Ex. C#
+    protected override void Up(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.Sql(@"
+            UPDATE Books
+            SET CategoryId = 1
+            WHERE CategoryId IS NULL OR CategoryId = 0;
+        ");
+    }
