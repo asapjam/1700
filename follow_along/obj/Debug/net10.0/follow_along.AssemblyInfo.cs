@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("follow_along")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0ff25a3c5bf945a366e78ccb7a26118d498173ab")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8e8c4c9c5dc438a80530b4e4dcf9a17e2aa452c2")]
 [assembly: System.Reflection.AssemblyProductAttribute("follow_along")]
 [assembly: System.Reflection.AssemblyTitleAttribute("follow_along")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

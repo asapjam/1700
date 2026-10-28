@@ -1,0 +1,46 @@
+﻿@page
+@model music_manager.Pages.Albums.IndexModel
+@{
+    ViewData["Title"] = "Albums";
+}
+
+<h2>Albums</h2>
+
+<partial name="_StatusMessage" model="@TempData["StatusMessage"] as string" />
+
+<p>
+    <a asp-page="/Books/Create" class="btn btn-primary">Create New</a>
+</p>
+
+@if (Model.Albums.Count == 0)
+{
+    <p>No albums yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Artist</th>
+                <th>Songs</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var album in Model.Albums)
+            {
+                <tr>
+                    <td>@album.Name</td>
+                    <td>@album.Artist</td>
+                    <td>@album.Songs</td>
+                    <td>
+                        <a asp-page="./Edit" asp-route-id="@album.Id">Edit</a> |
+                        <a asp-page="./Delete" asp-route-id="@album.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
