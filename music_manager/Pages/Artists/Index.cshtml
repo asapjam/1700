@@ -22,8 +22,10 @@ else
         <thead>
             <tr>
                 <th>Name</th>
-                <th>Albums</th>
-                <th>Songs</th>
+                <th>Details</th>
+
+                @* <th>Albums</th>
+                <th>Songs</th> *@
             </tr>
         </thead>
 
@@ -32,7 +34,9 @@ else
             {
                 <tr>
                     <td>@artist.Name</td>
-                    <td>
+                    <td><a asp-page="./Details" asp-route-id="@artist.Id">Details</a></td>
+                    
+                    @* <td>
                     @foreach(var album in artist.Albums)
                     {
                         <p>@album.Name</p>
@@ -43,7 +47,7 @@ else
                     {
                         <p>@song.Title</p>
                     }
-                    </td>
+                    </td> *@
                 </tr>
             }
         </tbody>

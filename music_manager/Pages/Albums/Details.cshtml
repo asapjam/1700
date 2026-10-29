@@ -1,0 +1,35 @@
+﻿@page "{Id:int}"
+@using music_manager.Models
+@model music_manager.Pages.Albums.DetailsModel
+@{
+    ViewData["Title"] = "Album Details";
+}
+
+<h2>Album Details</h2>
+
+@if (Model.Album is not null)
+{
+    <table class="table">
+    <thead>
+        <tr>
+            <th><strong>Name:</strong></th>
+            <th><strong>Artist:</th>
+            <th><strong>Songs:</strong></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Model.Album.Name</td>
+            <td>
+                <p>@Model.Album.Artist?.Name</p>
+            </td>
+            <td>
+                @foreach(Song? song in Model.Album.Songs)
+                {
+                    <a asp-page="../Songs/Details" asp-route-id="@song.Id">@song.Title</a>
+                }
+            </td>
+        </tr>
+    </tbody>
+    </table>
+}

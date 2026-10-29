@@ -50,31 +50,40 @@ public class EditModel : PageModel
     public InputModel Input { get; set; } = new();
 
     //Pull Artists from the database
-    public List<Artist> Artists = new();
+    public List<Artist> Artists { get; set; } = new();
 
     //Pull Albums from the database
-    public List<Album> Albums = new();
+    public List<Album> Albums { get; set; } = new();
  
-    public async Task<IActionResult> OnGetAsync(int id)
+    public async Task<IActionResult> OnGetAsync(int Id)
     {
         GrabAllArtists();
         GrabAllAlbums();
 
         var song = await _context.Songs
             .AsNoTracking()
-            .FirstOrDefaultAsync(s => s.Id == id);
+            .FirstOrDefaultAsync(s => s.Id == Id);
+
+        Console.WriteLine("OnGet song:");
+        Console.WriteLine(song.Id);
 
         if (song is null)
         {
             return NotFound();
         }
 
-        Input.Id = song.Id;
-        Input.Title = song.Title;
-        Input.ReleaseYear = song.ReleaseYear;
-        Input.Genre = song.Genre;
-        Input.AlbumId = song.AlbumId;
-        Input.ArtistId = song.ArtistId;
+        Input = new InputModel
+        {
+            Id = song.Id,
+            Title = song.Title,
+            ReleaseYear = song.ReleaseYear,
+            Genre = song.Genre,
+            AlbumId = song.AlbumId,
+            ArtistId = song.ArtistId
+        };
+
+        Console.WriteLine("OnGet Input.Id:");
+        Console.WriteLine(Input.Id);
 
         return Page();
     }
@@ -117,8 +126,14 @@ public class EditModel : PageModel
 
         var song = await _context.Songs.FindAsync(Input.Id);
 
+        Console.WriteLine("Input ReleaseYear");
+        Console.WriteLine(Input.ReleaseYear);
+        Console.WriteLine("song");
+        Console.WriteLine(song);
+
         if (song is null)
         {
+            Console.WriteLine("Song is null...");
             return NotFound();
         }
 

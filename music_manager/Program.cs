@@ -31,4 +31,6 @@ app.MapStaticAssets();
 app.MapRazorPages()
    .WithStaticAssets();
 
+app.MapBookEndpoints();
+
 app.Run();

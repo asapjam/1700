@@ -24,9 +24,11 @@ else
                 <th>Title</th>
                 <th>Release Year</th>
                 <th>Genre</th>
-                <th>Album</th>
+                <th>Details</th>
+
+                @* <th>Album</th>
                 <th>Artist</th>
-                <th>Actions</th>
+                <th>Actions</th> *@
             </tr>
         </thead>
 
@@ -37,12 +39,14 @@ else
                     <td>@song.Title</td>
                     <td>@song.ReleaseYear</td>
                     <td>@song.Genre</td>
-                    <td>@song.Album?.Name</td>
+                    <td><a asp-page="./Details" asp-route-id="@song.Id">Details</a></td>
+
+                    @* <td>@song.Album?.Name</td>
                     <td>@song.Artist?.Name</td>
                     <td>
                         <a asp-page="./Edit" asp-route-id="@song.Id">Edit</a> |
                         <a asp-page="./Delete" asp-route-id="@song.Id">Delete</a>
-                    </td>
+                    </td> *@
                 </tr>
             }
         </tbody>

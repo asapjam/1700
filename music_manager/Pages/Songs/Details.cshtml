@@ -1,4 +1,36 @@
 ﻿@page "{Id:int}"
 @model music_manager.Pages.Songs.DetailsModel
 @{
+    ViewData["Title"] = "Song Details";
+}
+
+<h2>Song Details</h2>
+
+@if (Model.Song is not null)
+{
+    <table class="table">
+    <thead>
+        <tr>
+            <th><strong>Title:</strong></th>
+            <th><strong>Release Year:</th>
+            <th><strong>Genre:</strong></th>
+            <th><strong>Album:</strong></th>
+            <th><strong>Artist:</strong></th>
+            <th><strong>Actions:</strong></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Model.Song.Title</td>
+            <td>@Model.Song.ReleaseYear</td>
+            <td>@Model.Song.Genre</td>
+            <td><a asp-page="../Albums/Details" asp-route-id="@Model.Song.Album?.Id">@Model.Song.Album?.Name</a></td>
+            <td><a asp-page="../Artists/Details" asp-route-id="@Model.Song.Artist?.Id">@Model.Song.Artist?.Name</a></td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@Model.Song.Id">Edit</a> |
+                <a asp-page="./Delete" asp-route-id="@Model.Song.Id">Delete</a>
+            </td>
+        </tr>
+    </tbody>
+    </table>
 }
