@@ -10,5 +10,6 @@ public class Artist
     // Each Artist has many Albums and many Songs.
     [JsonIgnore]
     public List<Album> Albums { get; set; } = new();
+    [JsonIgnore]
     public List<Song> Songs { get; set; } = new();
 }

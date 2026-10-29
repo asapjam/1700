@@ -15,5 +15,5 @@ public class Song
 
     // Each Song has one Album.
     public int AlbumId { get; set; }
-    public Artist? Album { get; set; }
+    public Album? Album { get; set; }
 }

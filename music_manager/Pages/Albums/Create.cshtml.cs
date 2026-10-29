@@ -79,7 +79,7 @@ public class CreateModel : PageModel
         _context.Albums.Add(album);
         await _context.SaveChangesAsync();
 
-        TempData["StatusMessage"] = "Artist created successfully!";
+        TempData["StatusMessage"] = "Album created successfully!";
 
         return RedirectToPage("./Index");
     }

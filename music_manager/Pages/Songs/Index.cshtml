@@ -1,4 +1,50 @@
 ﻿@page
-@model music_manager.Pages.Artists.IndexModel
+@model music_manager.Pages.Songs.IndexModel
 @{
+    ViewData["Title"] = "Songs";
+}
+
+<h2>Songs</h2>
+
+<partial name="_StatusMessage" model="@TempData["StatusMessage"] as string" />
+
+<p>
+    <a asp-page="/Songs/Create" class="btn btn-primary">Create New</a>
+</p>
+
+@if (Model.Songs.Count == 0)
+{
+    <p>No songs yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Release Year</th>
+                <th>Genre</th>
+                <th>Album</th>
+                <th>Artist</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var song in Model.Songs)
+            {
+                <tr>
+                    <td>@song.Title</td>
+                    <td>@song.ReleaseYear</td>
+                    <td>@song.Genre</td>
+                    <td>@song.Album?.Name</td>
+                    <td>@song.Artist?.Name</td>
+                    <td>
+                        <a asp-page="./Edit" asp-route-id="@song.Id">Edit</a> |
+                        <a asp-page="./Delete" asp-route-id="@song.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }

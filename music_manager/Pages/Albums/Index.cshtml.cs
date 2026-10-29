@@ -28,6 +28,8 @@ namespace music_manager.Pages.Albums
         {
             Albums = await _context.Albums
                 .AsNoTracking()
+                .Include(b => b.Songs)
+                .Include(b => b.Artist)
                 .OrderBy(b => b.Name)
                 .ToListAsync();
         }

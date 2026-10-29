@@ -11,8 +11,28 @@ namespace music_manager.Pages.Artists
 {
     public class IndexModel : PageModel
     {
-        public void OnGet()
+        // Create an AppDbContext, so we have a disposable doorway to the Database
+        private readonly AppDbContext _context;
+
+        // Define Constructor, which takes a AppDbContext, so we can communicate w/ DB
+        public IndexModel(AppDbContext context)
         {
+            _context = context;
         }
+
+        // Define an empty List of Albums
+        public List<Artist> Artists { get; private set; } = new();
+
+        // Fill that list with the existing entries in the Database.
+        public async Task OnGetAsync()
+        {
+            Artists = await _context.Artists
+                .AsNoTracking()
+                .Include(b => b.Songs)
+                .Include(b => b.Albums)
+                .OrderBy(b => b.Name)
+                .ToListAsync();
+        }
+
     }
 }

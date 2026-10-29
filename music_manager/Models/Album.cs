@@ -14,5 +14,5 @@ public class Album
 
     // Each Album has many Songs.
     [JsonIgnore]
-    public List<Song> Songs { get; set; } = new();
+    public List<Song>? Songs { get; set; } = new();
 }

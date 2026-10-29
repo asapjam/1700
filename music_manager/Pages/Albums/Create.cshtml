@@ -1,4 +1,47 @@
 ﻿@page
 @model music_manager.Pages.Albums.CreateModel
 @{
+    ViewData["Title"] = "Add Album";
+}
+
+<h2>Add an Album</h2>
+
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Input.Name" class="form-label"></label>
+        <input asp-for="Input.Name" class="form-control" />
+        <span asp-validation-for="Input.Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Input.ReleaseYear" class="form-label"></label>
+        <input asp-for="Input.ReleaseYear" class="form-control" />
+        <span asp-validation-for="Input.ReleaseYear" class="text-danger"></span>
+    </div>
+    
+    <div class="mb-3">
+    <label asp-for="Input.ArtistId" class="form-label">Artist</label>
+    <select asp-for="Input.ArtistId" class="form-select">
+        <option value="0">-- Select a category --</option>
+
+        @foreach (var artist in Model.Artists)
+        {
+            <option value="@artist.Id">
+                @artist.Name
+            </option>
+        }
+    </select>
+
+    <span asp-validation-for="Input.ArtistId"
+          class="text-danger"></span>
+</div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-page="./Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }

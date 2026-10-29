@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\web\\Downloads\\1700\\follow_along\\follow_along.csproj": {}
+    "C:\\Users\\web\\Documents\\GitHub\\1700\\follow_along\\follow_along.csproj": {}
   },
   "projects": {
-    "C:\\Users\\web\\Downloads\\1700\\follow_along\\follow_along.csproj": {
+    "C:\\Users\\web\\Documents\\GitHub\\1700\\follow_along\\follow_along.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\web\\Downloads\\1700\\follow_along\\follow_along.csproj",
+        "projectUniqueName": "C:\\Users\\web\\Documents\\GitHub\\1700\\follow_along\\follow_along.csproj",
         "projectName": "follow_along",
-        "projectPath": "C:\\Users\\web\\Downloads\\1700\\follow_along\\follow_along.csproj",
+        "projectPath": "C:\\Users\\web\\Documents\\GitHub\\1700\\follow_along\\follow_along.csproj",
         "packagesPath": "C:\\Users\\web\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\web\\Downloads\\1700\\follow_along\\obj\\",
+        "outputPath": "C:\\Users\\web\\Documents\\GitHub\\1700\\follow_along\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -26,12 +26,10 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net10.0": {
-            "framework": "net10.0",
             "targetAlias": "net10.0",
             "projectReferences": {}
           }
@@ -46,11 +44,10 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.300"
+        "SdkAnalysisLevel": "10.0.100"
       },
       "frameworks": {
         "net10.0": {
-          "framework": "net10.0",
           "targetAlias": "net10.0",
           "dependencies": {
             "Microsoft.EntityFrameworkCore.Design": {
@@ -83,7 +80,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.110/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",

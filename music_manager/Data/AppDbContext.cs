@@ -10,9 +10,11 @@ public class AppDbContext : DbContext
     {
     }
 
-    public DbSet<Song> Song => Set<Song>();
-    public DbSet<Album> Albums => Set<Album>();
     public DbSet<Artist> Artists => Set<Artist>();
+    public DbSet<Album> Albums => Set<Album>();
+    public DbSet<Song> Songs => Set<Song>();
+
+    
 
     // protected override void OnModelCreating(ModelBuilder modelBuilder)
     // {

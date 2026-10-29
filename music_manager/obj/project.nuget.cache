@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "k/jRpTDfJ0g=",
+  "dgSpecHash": "G88kw2joJ3Q=",
   "success": true,
-  "projectFilePath": "c:\\Users\\web\\Downloads\\1700\\music_manager\\music_manager.csproj",
+  "projectFilePath": "C:\\Users\\web\\Documents\\GitHub\\1700\\music_manager\\music_manager.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\web\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\web\\.nuget\\packages\\microsoft.build.framework\\18.0.2\\microsoft.build.framework.18.0.2.nupkg.sha512",

@@ -9,7 +9,7 @@
 <partial name="_StatusMessage" model="@TempData["StatusMessage"] as string" />
 
 <p>
-    <a asp-page="/Books/Create" class="btn btn-primary">Create New</a>
+    <a asp-page="/Albums/Create" class="btn btn-primary">Create New</a>
 </p>
 
 @if (Model.Albums.Count == 0)
@@ -22,9 +22,9 @@ else
         <thead>
             <tr>
                 <th>Name</th>
+                <th>Release Year</th>
                 <th>Artist</th>
                 <th>Songs</th>
-                <th>Actions</th>
             </tr>
         </thead>
 
@@ -33,11 +33,13 @@ else
             {
                 <tr>
                     <td>@album.Name</td>
-                    <td>@album.Artist</td>
-                    <td>@album.Songs</td>
+                    <td>@album.ReleaseYear</td>
+                    <td>@album.Artist?.Name</td>
                     <td>
-                        <a asp-page="./Edit" asp-route-id="@album.Id">Edit</a> |
-                        <a asp-page="./Delete" asp-route-id="@album.Id">Delete</a>
+                        @foreach(var song in album.Songs)
+                        {
+                            <p>@song.Title</p>
+                        }
                     </td>
                 </tr>
             }
