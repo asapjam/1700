@@ -12,11 +12,13 @@ public class CreateModel : PageModel
 {
     //DbContext allows us to chatter w/ database
     private readonly AppDbContext _context;
+    private readonly ILogger<CreateModel> _logger;
 
     //Constructor makes a disposable DbContext automatically?
-    public CreateModel(AppDbContext context)
+    public CreateModel(AppDbContext context, ILogger<CreateModel> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     //Define what parameters nested InputModel will accept
@@ -35,22 +37,32 @@ public class CreateModel : PageModel
     //Validate form, use the InputModel Object and its bound properties to make a Recipe Object and add it to our DbContext which writes it to the SQLite database
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid)
+        try
         {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
+            var artist = new Artist
+            {
+                Name = Input.Name.Trim(),
+            };
+
+            _context.Artists.Add(artist);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Artist created successfully: {ArtistName} (ID: {ArtistId})", artist.Name, artist.Id);
+            TempData["StatusMessage"] = "Artist created successfully!";
+
+            return RedirectToPage("./Index");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while creating the artist.");
+            ModelState.AddModelError(string.Empty, "An error occurred while creating the artist. Please try again later.");
             return Page();
         }
-
-        var artist = new Artist
-        {
-            Name = Input.Name.Trim(),
-        };
-
-        _context.Artists.Add(artist);
-        await _context.SaveChangesAsync();
-
-        TempData["StatusMessage"] = "Artist created successfully!";
-
-        return RedirectToPage("./Index");
     }
 }
 

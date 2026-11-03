@@ -12,10 +12,14 @@ namespace follow_along.Pages.Books;
 public class CreateModel : PageModel
 {
     private readonly AppDbContext _context;
+    private readonly ILogger<CreateModel> _logger;
 
-    public CreateModel(AppDbContext context)
+    public CreateModel(
+    AppDbContext context,
+    ILogger<CreateModel> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     [BindProperty]
@@ -67,7 +71,12 @@ public class CreateModel : PageModel
         _context.Books.Add(book);
         await _context.SaveChangesAsync();
 
-        TempData["StatusMessage"] = "Book created successfully!";
+        TempData["StatusMessage"] =
+            "Book created successfully!";
+
+        _logger.LogInformation(
+            "Book {BookId} created successfully",
+            book.Id);
 
         return RedirectToPage("./Index");
     }

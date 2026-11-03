@@ -13,26 +13,36 @@ namespace music_manager.Pages.Albums
     {
         // Create an AppDbContext, so we have a disposable doorway to the Database
         private readonly AppDbContext _context;
+        private readonly ILogger<IndexModel> _logger;
 
         // Define Constructor, which takes a AppDbContext, so we can communicate w/ DB
-        public IndexModel(AppDbContext context)
+        public IndexModel(AppDbContext context, ILogger<IndexModel> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // Define an empty List of Albums
         public List<Album> Albums { get; private set; } = new();
 
         // Fill that list with the existing entries in the Database.
-        public async Task OnGetAsync()
+        public async Task<IActionResult> OnGetAsync()
         {
-            Albums = await _context.Albums
-                .AsNoTracking()
-                .Include(b => b.Songs)
-                .Include(b => b.Artist)
-                .OrderBy(b => b.Name)
-                .ToListAsync();
+            try
+            {
+                Albums = await _context.Albums
+                    .AsNoTracking()
+                    .Include(b => b.Songs)
+                    .Include(b => b.Artist)
+                    .OrderBy(b => b.Name)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving albums.");
+                ModelState.AddModelError(string.Empty, "An error occurred while retrieving albums. Please try again later.");
+            }
+            return Page();
         }
-
     }
 }

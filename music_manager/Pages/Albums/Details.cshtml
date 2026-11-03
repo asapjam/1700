@@ -5,31 +5,53 @@
     ViewData["Title"] = "Album Details";
 }
 
-<h2>Album Details</h2>
+<main>
 
-@if (Model.Album is not null)
-{
-    <table class="table">
-    <thead>
-        <tr>
-            <th><strong>Name:</strong></th>
-            <th><strong>Artist:</th>
-            <th><strong>Songs:</strong></th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>@Model.Album.Name</td>
-            <td>
-                <p>@Model.Album.Artist?.Name</p>
-            </td>
-            <td>
-                @foreach(Song? song in Model.Album.Songs)
-                {
-                    <a asp-page="../Songs/Details" asp-route-id="@song.Id">@song.Title</a>
-                }
-            </td>
-        </tr>
-    </tbody>
-    </table>
-}
+    <header>
+
+        <h2>Album Details</h2>
+
+    </header>
+
+    @if (Model.Album is not null)
+    {
+        <table class="table">
+        <thead>
+            <tr>
+                <th><strong>Name:</strong></th>
+                <th><strong>Artist:</th>
+                <th><strong>Songs:</strong></th>
+                <th><strong>Actions:</strong></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@Model.Album.Name</td>
+                <td>
+                    <p>@Model.Album.Artist?.Name</p>
+                </td>
+                <td>
+                    <ul>
+                        @foreach(Song? song in Model.Album.Songs)
+                        {
+                            <li>
+                                <a asp-page="../Songs/Details" asp-route-id="@song.Id">@song.Title</a>
+                            </li>
+                        }
+                    </ul>
+                </td>
+                <td>
+                    <a asp-page="./Edit" asp-route-id="@Model.Album.Id">Edit</a> |
+                    <a asp-page="./Delete" asp-route-id="@Model.Album.Id">Delete</a>
+                </td>
+            </tr>
+        </tbody>
+        </table>
+    }
+
+
+</main>
+
+
+
+

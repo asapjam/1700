@@ -1,0 +1,55 @@
+﻿@page "{Id:int}"
+@using music_manager.Models
+@model music_manager.Pages.Albums.DeleteModel
+@{
+    ViewData["Title"] = "Delete Album";
+}
+<main>
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <header>
+
+        <h2>Delete Album</h2>
+
+    </header>
+
+    <h3>Are you sure you want to delete this album?</h3>
+
+    @if (Model.Album is not null)
+    {
+        <table class="table">
+        <thead>
+            <tr>
+                <th><strong>Album:</strong></th>
+                <th><strong>Release Year:</th>
+                <th><strong>Artist:</strong></th>
+                <th><strong>Songs:</strong></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@Model.Album.Name</td>
+                <td>@Model.Album.ReleaseYear</td>
+                <td>@Model.Album.Artist?.Name</td>
+                <td>
+                    <ul>
+                    @foreach(Song? song in Model.Album.Songs)
+                    {
+                        <li>
+                            <a asp-page="../Songs/Details" asp-route-id="@song.Id">@song.Title</a>
+                        </li>
+                    }
+                    </ul>
+                </td>
+            </tr>
+        </tbody>
+        </table>
+    }
+
+    <form method="post">
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a asp-page="./Index" class="btn btn-secondary">Cancel</a>
+    </form>
+    
+</main>
+
+

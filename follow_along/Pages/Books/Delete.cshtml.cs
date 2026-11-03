@@ -10,10 +10,14 @@ namespace follow_along.Pages.Books;
 public class DeleteModel : PageModel
 {
     private readonly AppDbContext _context;
+    private readonly ILogger<DeleteModel> _logger;
 
-    public DeleteModel(AppDbContext context)
+    public DeleteModel(
+    AppDbContext context,
+    ILogger<DeleteModel> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     public Book? Book { get; private set; }
@@ -26,6 +30,10 @@ public class DeleteModel : PageModel
 
         if (Book is null)
         {
+            _logger.LogWarning(
+                "Delete requested for missing book {BookId}",
+                id);
+
             return NotFound();
         }
 
@@ -44,7 +52,12 @@ public class DeleteModel : PageModel
         _context.Books.Remove(book);
         await _context.SaveChangesAsync();
 
-        TempData["StatusMessage"] = "Book deleted successfully!";
+        TempData["StatusMessage"] =
+            "Book deleted successfully!";
+
+        _logger.LogInformation(
+            "Book {BookId} deleted successfully",
+            id);
 
         return RedirectToPage("./Index");
     }

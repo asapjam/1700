@@ -1,4 +1,4 @@
-# 1700
+ # 1700
 
 Course Work for 1700
 
@@ -1094,6 +1094,7 @@ Ex. _BookRow.cshtml
 
 Instead of repeating the row markup in every place you list books, use the <partial> tag helper:
 Ex.
+
     @foreach (var book in Model.Books)
     {
         <partial name="_BookRow" model="book" />
@@ -1105,11 +1106,14 @@ Stored in a Dictionary.
 Great for user feedback.
 
 Storing:
+
 Ex. C#
+
     TempData["StatusMessage"] = "Book created successfully!";
 
 Retrieving via Partial:
 Ex. _StatusMessage.csHTML:
+
     @model string
 
     @if (!string.IsNullOrEmpty(Model))
@@ -1118,6 +1122,307 @@ Ex. _StatusMessage.csHTML:
             @Model
         </div>
     }
+
 Ex. csHTML
+
     <partial name="_StatusMessage" model="TempData["StatusMessage"] as string" />
 
+# MODULE 8: Enhancements, Validation, and Filtering
+
+#### Data Validation with Annotations
+
+    using System.ComponentModel.DataAnnotations;
+
+Allows us to enforce rules for properties.
+
+Types of attributes:
+
+    [Required(ErrorMessage = "Title is required")]
+    [StringLength(100, MinimumLength = 3, ErrorMessage = "Title must be between 3 and 100 characters.")] 
+    public string Title { get; set; }
+
+    [Range(1, 5, ErrorMessage = "Rating must be between 1 and 5."))]
+    public int Rating { get; set; }
+
+Binding Properties allows us to map Form inputs to C# properties:
+
+    [BindProperty]
+    public string Author { get; set; } = "";
+
+Verified through:
+
+    if(!ModelState.IsValid){ return Page(); }
+
+#### Displaying Validation Errors
+
+To show an error next to an input, we will use "asp-validation-for":
+
+    <div>
+    <label asp-for="Book.Title"></label>
+    <input asp-for="Book.Title" class="form-control" />
+    <span asp-validation-for="Book.Title" class="text-danger"></span>
+    </div>
+
+To show ModelErrors we added manually, we will use "asp-validation-summary":
+
+C#
+
+    ModelState.AddModelError(
+        "Input.ArtistId",
+        "Please select a valid artist.");
+
+csHTML
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+Display errors without reloading page with "_ValidationScriptsPartial":
+
+    @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    }
+
+#### Form Security with Anti-Forgery Tokens
+
+Anti-Forgery Tokens prevent a specific type of attack known as Cross-Site Request Forgery (CSRF). This is essentially a bad actor intercepting a form submission to trick users into submitting data they had not intended.
+
+Example:
+- A user logs into your site (e.g., a banking app).
+- While still logged in, they visit a malicious website in another tab.
+- That site silently submits a request to your banking app using the user’s session cookie.
+
+These tokens are secret and generated with every legitimate form, and then verified the secret token is the same upon submission.
+Razor Pages includes this by default.
+
+To manually create an Anti-Forgery Token:
+
+    <form method="post">
+    @Html.AntiForgeryToken()
+    <input type="text" name="Title" />
+    <button type="submit">Save</button>
+    </form>
+
+#### Filtering and Searching Records
+
+This is generally done by writing the query to the URL, so it may be shared.
+To Bind that information stored in the URL we will use [BindProperty]:
+
+C#
+
+    [BindProperty(SupportsGet = true)]
+    public string? SearchTerm { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    public int? CategoryId { get; set; }
+
+csHTML
+
+    <form method="get" class="mb-3">
+    <input type="text" name="SearchTerm" value="@Model.SearchTerm" placeholder="Search by title or author" />
+
+    <select name="CategoryId">
+        <option value="">All Categories</option>
+        @foreach (var category in Model.AllCategories)
+        {
+            <option value="@category.Id" selected="@(category.Id == Model.CategoryId)">
+                @category.Name
+            </option>
+        }
+    </select>
+
+    <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
+
+This binds the query in the URL (Ex. ?SearchTerm=abc) to its C# property.
+This binds the query in the URL (Ex.?CategoryId=2) to its C# property.
+
+#### Querying the Database with LINQ Statements
+
+    var query = _context.Books
+    .Include(b => b.Category)
+    .AsQueryable();
+    
+    if (!string.IsNullOrWhiteSpace(SearchTerm))
+    {
+        query = query.Where(b =>
+            b.Title.Contains(SearchTerm) ||
+            b.Author.Contains(SearchTerm));
+    }
+    
+    if (CategoryId.HasValue)
+    {
+        query = query.Where(b => b.CategoryId == CategoryId.Value);
+    }
+    
+    Books = await query.OrderBy(b => b.Title).ToListAsync();
+
+# MODULE 9: Final Touches - Error Handling, Logging, and Semantic HTML
+
+#### Safe Error Handling in Razor Pages
+
+An exception is a runtime signal that something went wrong.
+
+Ex.
+  - NullReferenceException
+- DbUpdateConcurrencyException
+- ApplicationException
+
+When errors happen .Net *throws* an exception object.
+
+    public void SaveBook(Book book)
+    {
+        if (book == null)
+        {
+            // Throwing
+            throw new ArgumentNullException(nameof(book));
+        }
+
+    _context.Books.Add(book);
+    _context.SaveChanges(); // May throw other exceptions that bubble up
+    }
+
+That exception object will *bubble* up the call stack. 
+
+If the exception object does not hit a *catch* block, it will bubble to the top and crash the app.
+
+    try
+    {
+        await _context.SaveChangesAsync();
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Unexpected error during save.");
+        ModelState.AddModelError(string.Empty, "Something went wrong. Please try again.");
+    }
+
+Catch blocks need to log the exception, not just swallow it. If the current Catch block cannot address the error, re-throw the error.
+
+    catch (Exception)
+    {
+        throw; // preserves original details
+    }
+
+Wrapping an exception can give additional context to the error, while preserving the original exception.
+
+    try
+    {
+        await _context.SaveChangesAsync();
+    }
+    catch (DbUpdateException ex)
+    {
+        throw new ApplicationException("Failed to save Book entity.", ex);
+    }
+
+Catch specific errors first, then have tools in place for general errors later.
+
+    try
+    {
+        await _context.SaveChangesAsync();
+    }
+    catch (DbUpdateConcurrencyException dbex)
+    {
+        _logger.LogError(dbex, "Concurrency conflict while saving book.");
+        return NotFound();
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Unexpected error while saving book.");
+        ModelState.AddModelError(string.Empty, "Something went wrong.");
+        return Page();
+    }
+
+#### Application Logging with ILogger
+
+    using Microsoft.Extensions.Logging;
+
+Initialized within the constructor:
+
+    private readonly AppDbContext _context;
+    private readonly ILogger<EditModel> _logger;
+            public EditModel(AppDbContext context, ILogger<EditModel> logger)
+            {
+                _context = context;
+                _logger = logger;
+            }
+
+ILogger is a built-in logging system for ASP.NET Core.
+Logs are a record of what the application does, and if that attempt succeeded or failed and why.
+
+This is how you will see the exceptions through the console.
+
+Logging Levels
+- Information
+```_logger.LogInformation("Book {Id} updated successfully.", book.Id);```
+- Warning
+ ```_logger.LogWarning("Edit attempted on a non-existent book ID {Id}.", id);```
+ - Error
+ ```_logger.LogError(ex, "Error while saving Book {Id}.", book.Id);```
+
+Don't log everything.
+Don't be verbose.
+Don't log senstive data.
+
+Logs don't use:
+`$"I am a string with a {Object.Name}"`
+
+Logs omit the Dollar-Sign so you may store the data in the log directly:
+`"I am a string with a {Object.Name}"`
+
+#### User-Friendly Messaging vs. Developer Logs
+
+User feedback should guide and reassure.
+Developer Logs should give technical insight to internal happenings or why something failed.
+
+User feedback is generally saved to TempData before a redirect.
+Rendered through a shared partial like _StatusMessage.cshtml after a redirect:
+
+C#
+
+    TempData["StatusMessage"] = "Book created successfully!";
+    return RedirectToPage("Index");
+
+csHTML partial
+
+    @model string
+
+    @if (!string.IsNullOrEmpty(Model))
+    {
+        <div class="alert alert-success" role="alert">
+            @Model
+        </div>
+    }
+
+#### Semantic HTML and Accessibility
+
+HTML Semantics are vital for accessibility, maintainability, and compatibility.
+HTML must be human readable and machine readable.
+Semantics describe their block's role in the document.
+
+Semantics:
+
+    Layout landmarks
+      <header> Introductory content or section headings
+      <nav> Navigation links
+      <main> Central content
+      <footer> Closing information, copyright
+    Content organization
+      <section> Thematic grouping of content
+      <article> Independent, reusable pieces of content
+      <aside> Supplementary content, such as a sidebar
+    Forms & inputs
+      <form> Encloses form controls
+      <fieldset>, <legend> Group related inputs with a description.
+      <label>
+     Tables
+       <table>, <thead>, <tbody>, <th>, <td>
+
+Screen Readers rely on Semantics.
+Keyboard navigation rely on Semantics.
+Error Handling relies on Semantics.
+
+#### The Request Cycle
+
+- Request received → A GET or POST request triggers a page handler.
+- Validation and error handling → Input is validated and exceptions are caught if they occur.
+- Logging → Technical details of the request, including warnings or errors, are written to logs.
+- User feedback → Success or error messages are sent back to the user through TempData or validation spans.
+- Response rendered → The Razor Page is displayed, structured with semantic HTML for accessibility.

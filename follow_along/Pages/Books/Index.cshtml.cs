@@ -22,10 +22,23 @@ public class IndexModel : PageModel
 
     public async Task OnGetAsync()
     {
-        Books = await _context.Books
+        var query = _context.Books
             .AsNoTracking()
             .Include(b => b.Category)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(SearchTerm))
+        {
+            query = query.Where(b =>
+                b.Title.Contains(SearchTerm) ||
+                b.Author.Contains(SearchTerm));
+        }
+
+        Books = await query
             .OrderBy(b => b.Title)
             .ToListAsync();
     }
+    
+    [BindProperty(SupportsGet = true)]
+    public string? SearchTerm { get; set; }
 }

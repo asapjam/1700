@@ -12,11 +12,13 @@ public class CreateModel : PageModel
 {
     //DbContext allows us to chatter w/ database
     private readonly AppDbContext _context;
+    private readonly ILogger<CreateModel> _logger;
 
     //Constructor makes a disposable DbContext automatically?
-    public CreateModel(AppDbContext context)
+    public CreateModel(AppDbContext context, ILogger<CreateModel> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     //Define what parameters nested InputModel will accept
@@ -55,8 +57,16 @@ public class CreateModel : PageModel
  
     public async Task OnGetAsync()
     {
-        GrabAllArtists();
-        GrabAllAlbums();
+        try
+        {
+            GrabAllArtists();
+            GrabAllAlbums();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while retrieving artists and albums for the create song page.");
+            ModelState.AddModelError(string.Empty, "An error occurred while retrieving artists and albums. Please try again later.");
+        }
     }
 
     private async void GrabAllArtists()
@@ -76,10 +86,6 @@ public class CreateModel : PageModel
     //Validate form, use the InputModel Object and its bound properties to make a Recipe Object and add it to our DbContext which writes it to the SQLite database
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid)
-        {
-            return Page();
-        }
 
         if (!await ArtistExistsAsync(Input.ArtistId))
         {
@@ -95,6 +101,11 @@ public class CreateModel : PageModel
                 "Please select a valid album.");
         }
 
+        if (!ModelState.IsValid)
+        {
+            return Page();
+        }
+
         var song = new Song
         {
             Title = Input.Title.Trim(),
@@ -104,12 +115,22 @@ public class CreateModel : PageModel
             ArtistId = Input.ArtistId
         };
 
-        _context.Songs.Add(song);
-        await _context.SaveChangesAsync();
+        try
+        {
+            _context.Songs.Add(song);
+            await _context.SaveChangesAsync();
 
-        TempData["StatusMessage"] = "Song created successfully!";
+            _logger.LogInformation("New Song created with Id: {Id}.", song.Id);
+            TempData["StatusMessage"] = "Song created successfully!";
 
-        return RedirectToPage("./Index");
+            return RedirectToPage("./Index");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while creating a new song.");
+            ModelState.AddModelError(string.Empty, "An error occurred while creating the song. Please try again later.");
+            return Page();
+        }
     }
 
     //Validation helper functions

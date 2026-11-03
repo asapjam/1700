@@ -12,11 +12,13 @@ public class EditModel : PageModel
 {
     //DbContext allows us to chatter w/ database
     private readonly AppDbContext _context;
+    private readonly ILogger<EditModel> _logger;
 
     //Constructor makes a disposable DbContext automatically?
-    public EditModel(AppDbContext context)
+    public EditModel(AppDbContext context, ILogger<EditModel> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     //Define what parameters nested InputModel will accept
@@ -57,34 +59,34 @@ public class EditModel : PageModel
  
     public async Task<IActionResult> OnGetAsync(int Id)
     {
-        GrabAllArtists();
-        GrabAllAlbums();
-
-        var song = await _context.Songs
-            .AsNoTracking()
-            .FirstOrDefaultAsync(s => s.Id == Id);
-
-        Console.WriteLine("OnGet song:");
-        Console.WriteLine(song.Id);
-
-        if (song is null)
+        try
         {
-            return NotFound();
+            GrabAllArtists();
+            GrabAllAlbums();
+
+            var song = await _context.Songs
+                .AsNoTracking()
+                .FirstOrDefaultAsync(s => s.Id == Id);
+
+            if (song is null)
+            {
+                return NotFound();
+            }
+
+            Input = new InputModel
+            {
+                Id = song.Id,
+                Title = song.Title,
+                ReleaseYear = song.ReleaseYear,
+                Genre = song.Genre,
+                AlbumId = song.AlbumId,
+                ArtistId = song.ArtistId
+            };
+        } catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while retrieving the song for editing with Id: {Id}.", Id);
+            ModelState.AddModelError(string.Empty, "An error occurred while retrieving the song for editing. Please try again later.");
         }
-
-        Input = new InputModel
-        {
-            Id = song.Id,
-            Title = song.Title,
-            ReleaseYear = song.ReleaseYear,
-            Genre = song.Genre,
-            AlbumId = song.AlbumId,
-            ArtistId = song.ArtistId
-        };
-
-        Console.WriteLine("OnGet Input.Id:");
-        Console.WriteLine(Input.Id);
-
         return Page();
     }
 
@@ -105,49 +107,54 @@ public class EditModel : PageModel
     //Validate form, use the InputModel Object and its bound properties to make a Recipe Object and add it to our DbContext which writes it to the SQLite database
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid)
+        try
         {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
+            if (!await ArtistExistsAsync(Input.ArtistId))
+            {
+                ModelState.AddModelError(
+                    "Input.ArtistId",
+                    "Please select a valid artist.");
+            }
+
+            if (!await AlbumExistsAsync(Input.AlbumId))
+            {
+                ModelState.AddModelError(
+                    "Input.AlbumId",
+                    "Please select a valid album.");
+            }
+
+            var song = await _context.Songs.FindAsync(Input.Id);
+
+            if (song is null)
+            {
+                _logger.LogWarning("Edit attempted on non-existent song with Id: {Id}.", Input.Id);
+                return NotFound();
+            }
+
+            song.Title = Input.Title.Trim();
+            song.ReleaseYear = Input.ReleaseYear;
+            song.Genre = Input.Genre.Trim();
+            song.AlbumId = Input.AlbumId;
+            song.ArtistId = Input.ArtistId;
+
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Song with Id: {Id} was successfully edited.", Input.Id);
+            TempData["StatusMessage"] = "Song edited successfully!";
+
+            return RedirectToPage("./Index");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while committing edited song with Id: {Id} to the database.", Input.Id);
+            ModelState.AddModelError(string.Empty, "An error occurred while editing the song. Please try again later.");
             return Page();
-        }
-
-        if (!await ArtistExistsAsync(Input.ArtistId))
-        {
-            ModelState.AddModelError(
-                "Input.ArtistId",
-                "Please select a valid artist.");
-        }
-
-        if (!await AlbumExistsAsync(Input.AlbumId))
-        {
-            ModelState.AddModelError(
-                "Input.AlbumId",
-                "Please select a valid album.");
-        }
-
-        var song = await _context.Songs.FindAsync(Input.Id);
-
-        Console.WriteLine("Input ReleaseYear");
-        Console.WriteLine(Input.ReleaseYear);
-        Console.WriteLine("song");
-        Console.WriteLine(song);
-
-        if (song is null)
-        {
-            Console.WriteLine("Song is null...");
-            return NotFound();
-        }
-
-        song.Title = Input.Title.Trim();
-        song.ReleaseYear = Input.ReleaseYear;
-        song.Genre = Input.Genre.Trim();
-        song.AlbumId = Input.AlbumId;
-        song.ArtistId = Input.ArtistId;
-
-        await _context.SaveChangesAsync();
-
-        TempData["StatusMessage"] = "Song edited successfully!";
-
-        return RedirectToPage("./Index");
+        }    
     }
 
     //Validation helper functions

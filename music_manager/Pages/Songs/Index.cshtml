@@ -4,51 +4,96 @@
     ViewData["Title"] = "Songs";
 }
 
-<h2>Songs</h2>
+<main>
+    <form method="get" class="mb-3 d-flex card p-3">
+        <fieldset class="card-body">
+            <legend class="card-title">Search</legend>
 
-<partial name="_StatusMessage" model="@TempData["StatusMessage"] as string" />
+            <label for="SongSearchTerm">Song Title:</label>
+            <input type="text" name="SongSearchTerm" value="@Model.SongSearchTerm" placeholder="Search by Song Title!" />
 
-<p>
-    <a asp-page="/Songs/Create" class="btn btn-primary">Create New</a>
-</p>
+            @* <select name="SearchAlbumId">
+                <option value="">All Albums</option>
+                @foreach (Models.Album album in Model.AllAlbums)
+                {
+                    <option value="@album.Id" selected="@(album.Id == Model.SearchAlbumId)">
+                        @album.Name
+                    </option>
+                }
+            </select> *@
 
-@if (Model.Songs.Count == 0)
-{
-    <p>No songs yet.</p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Release Year</th>
-                <th>Genre</th>
-                <th>Details</th>
+            <label for="SearchArtistId">Artist:</label>
+            <select name="SearchArtistId" class="form-select-sm">
+                <option value="">All Artists</option>
+                @foreach (Models.Artist artist in Model.AllArtists)
+                {
+                    <option value="@artist.Id" selected="@(artist.Id == Model.SearchArtistId)">
+                        @artist.Name
+                    </option>
+                }
+            </select>
+        </fieldset>
 
-                @* <th>Album</th>
-                <th>Artist</th>
-                <th>Actions</th> *@
-            </tr>
-        </thead>
+        <button type="submit" class="btn btn-primary">Search</button>
+        <a asp-page="/Songs/Index" class="btn btn-secondary">Clear</a>
 
-        <tbody>
-            @foreach (var song in Model.Songs)
-            {
+    </form>
+
+    <header>
+
+        <h2>Songs</h2> 
+
+    </header>
+
+    <partial name="_StatusMessage" model="@TempData["StatusMessage"] as string" />
+
+    <p>
+        <a asp-page="/Songs/Create" class="btn btn-primary">Create New</a>
+    </p>
+
+    @if (Model.Songs.Count == 0)
+    {
+        <p>No songs found.</p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>@song.Title</td>
-                    <td>@song.ReleaseYear</td>
-                    <td>@song.Genre</td>
-                    <td><a asp-page="./Details" asp-route-id="@song.Id">Details</a></td>
+                    <th>Title</th>
+                    <th>Release Year</th>
+                    <th>Genre</th>
+                    <th>Details</th>
 
-                    @* <td>@song.Album?.Name</td>
-                    <td>@song.Artist?.Name</td>
-                    <td>
-                        <a asp-page="./Edit" asp-route-id="@song.Id">Edit</a> |
-                        <a asp-page="./Delete" asp-route-id="@song.Id">Delete</a>
-                    </td> *@
+                    @* <th>Album</th>
+                    <th>Artist</th>
+                    <th>Actions</th> *@
                 </tr>
-            }
-        </tbody>
-    </table>
-}
+            </thead>
+
+            <tbody>
+                @foreach (var song in Model.Songs)
+                {
+                    <tr>
+                        <td>@song.Title</td>
+                        <td>@song.ReleaseYear</td>
+                        <td>@song.Genre</td>
+                        <td><a asp-page="./Details" asp-route-id="@song.Id">Details</a></td>
+
+                        @* <td>@song.Album?.Name</td>
+                        <td>@song.Artist?.Name</td>
+                        <td>
+                            <a asp-page="./Edit" asp-route-id="@song.Id">Edit</a> |
+                            <a asp-page="./Delete" asp-route-id="@song.Id">Delete</a>
+                        </td> *@
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</main>
+
+
+
+
+

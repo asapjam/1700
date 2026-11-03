@@ -12,9 +12,12 @@ public class EditModel : PageModel
 {
     private readonly AppDbContext _context;
 
-    public EditModel(AppDbContext context)
+    private readonly ILogger<EditModel> _logger;
+
+    public EditModel(AppDbContext context, ILogger<EditModel> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     [BindProperty]
@@ -46,6 +49,7 @@ public class EditModel : PageModel
 
         if (book is null)
         {
+            _logger.LogWarning("Edit requested for missing book {BookId}", id);
             return NotFound();
         }
 
@@ -81,6 +85,7 @@ public class EditModel : PageModel
 
         if (book is null)
         {
+            _logger.LogWarning("Edit requested for missing book {BookId}", Input.Id);
             return NotFound();
         }
 
@@ -88,9 +93,27 @@ public class EditModel : PageModel
         book.Author = Input.Author.Trim();
         book.CategoryId = Input.CategoryId;
 
-        await _context.SaveChangesAsync();
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex)
+        {
+            _logger.LogError(
+                ex,
+                "Database error while updating book {BookId}",
+                Input.Id);
+
+            ModelState.AddModelError(string.Empty, "The book could not be updated. Please try again.");
+
+            await LoadCategoriesAsync();
+
+            return Page();
+        }
 
         TempData["StatusMessage"] = "Book updated successfully!";
+
+        _logger.LogInformation("Book {BookId} updated successfully", book.Id);
 
         return RedirectToPage("./Index");
     }

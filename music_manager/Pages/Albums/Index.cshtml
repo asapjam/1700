@@ -4,48 +4,57 @@
     ViewData["Title"] = "Albums";
 }
 
-<h2>Albums</h2>
+<main>
 
-<partial name="_StatusMessage" model="@TempData["StatusMessage"] as string" />
+    <header>
+        <h2>Albums</h2>
+    </header>
+        
+    <partial name="_StatusMessage" model="@TempData["StatusMessage"] as string" />
 
-<p>
-    <a asp-page="/Albums/Create" class="btn btn-primary">Create New</a>
-</p>
+    <p>
+        <a asp-page="/Albums/Create" class="btn btn-primary">Create New</a>
+    </p>
 
-@if (Model.Albums.Count == 0)
-{
-    <p>No albums yet.</p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Release Year</th>
-                <th>Artist</th>
-                <th>Details</th>
-
-                @* <th>Songs</th> *@
-            </tr>
-        </thead>
-
-        <tbody>
-            @foreach (var album in Model.Albums)
-            {
+    @if (Model.Albums.Count == 0)
+    {
+        <p>No albums yet.</p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>@album.Name</td>
-                    <td>@album.ReleaseYear</td>
-                    <td><a asp-page="../Artists/Details" asp-route-id="@album.Artist?.Id">@album.Artist?.Name</a></td>
-                    <td><a asp-page="./Details" asp-route-id="@album.Id">Details</a></td>
-                    @* <td>
-                        @foreach(var song in album.Songs)
-                        {
-                            <p>@song.Title</p>
-                        }
-                    </td> *@
+                    <th>Name</th>
+                    <th>Release Year</th>
+                    <th>Artist</th>
+                    <th>Details</th>
+
+                    @* <th>Songs</th> *@
                 </tr>
-            }
-        </tbody>
-    </table>
-}
+            </thead>
+
+            <tbody>
+                @foreach (var album in Model.Albums)
+                {
+                    <tr>
+                        <td>@album.Name</td>
+                        <td>@album.ReleaseYear</td>
+                        <td><a asp-page="../Artists/Details" asp-route-id="@album.Artist?.Id">@album.Artist?.Name</a></td>
+                        <td><a asp-page="./Details" asp-route-id="@album.Id">Details</a></td>
+                        @* <td>
+                            @foreach(var song in album.Songs)
+                            {
+                                <p>@song.Title</p>
+                            }
+                        </td> *@
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    
+</main>
+
+
+
