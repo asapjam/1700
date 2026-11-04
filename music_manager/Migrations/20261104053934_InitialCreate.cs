@@ -73,6 +73,21 @@ namespace music_manager.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.InsertData(
+                table: "Artists",
+                columns: new[] { "Id", "Name" },
+                values: new object[] { 1, "Ludwig van Beethoven" });
+
+            migrationBuilder.InsertData(
+                table: "Albums",
+                columns: new[] { "Id", "ArtistId", "Name", "ReleaseYear" },
+                values: new object[] { 1, 1, "Beethoven: The Essentials", 2016 });
+
+            migrationBuilder.InsertData(
+                table: "Songs",
+                columns: new[] { "Id", "AlbumId", "ArtistId", "Genre", "ReleaseYear", "Title" },
+                values: new object[] { 1, 1, 1, "Classical", 1826, "Beethoven: Fidelio, Op. 72: Overture" });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Albums_ArtistId",
                 table: "Albums",

@@ -37,6 +37,15 @@ namespace music_manager.Migrations
                     b.HasIndex("ArtistId");
 
                     b.ToTable("Albums");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ArtistId = 1,
+                            Name = "Beethoven: The Essentials",
+                            ReleaseYear = 2016
+                        });
                 });
 
             modelBuilder.Entity("music_manager.Models.Artist", b =>
@@ -52,6 +61,13 @@ namespace music_manager.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Artists");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Ludwig van Beethoven"
+                        });
                 });
 
             modelBuilder.Entity("music_manager.Models.Song", b =>
@@ -84,6 +100,17 @@ namespace music_manager.Migrations
                     b.HasIndex("ArtistId");
 
                     b.ToTable("Songs");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AlbumId = 1,
+                            ArtistId = 1,
+                            Genre = "Classical",
+                            ReleaseYear = 1826,
+                            Title = "Beethoven: Fidelio, Op. 72: Overture"
+                        });
                 });
 
             modelBuilder.Entity("music_manager.Models.Album", b =>
